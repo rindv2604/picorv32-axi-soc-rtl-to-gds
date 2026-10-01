@@ -1,0 +1,142 @@
+# ============================================================
+# LibreLane / OpenROAD generated data
+# ============================================================
+
+**/runs/
+**/runs_archive/
+**/iterations/
+**/results/
+
+# Generated reports / archives
+reports/
+
+# Old submission / backup archives
+FINAL_SUBMISSION_ECO2/
+FINAL_SUBMISSION_ECO2.tar.gz
+backup/
+
+# ============================================================
+# Physical-design generated files
+# ============================================================
+
+*.odb
+*.def
+*.gds
+*.oas
+*.spef
+*.sdf
+*.sdc
+*.vcd
+
+# Keep source/config SDC explicitly tracked if needed:
+!constraints/
+!constraints/**/*.sdc
+!v3_hier/top/constraints/
+!v3_hier/top/constraints/**/*.sdc
+
+# Generated OpenROAD / STA / extraction outputs
+*.rpt
+*.log
+*.json.bak
+
+# ============================================================
+# Simulation / temporary files
+# ============================================================
+
+*.out
+*.vvp
+*.fst
+*.wlf
+*.jou
+*.history
+*.pyc
+__pycache__/
+
+# ============================================================
+# OS / editor files
+# ============================================================
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ============================================================
+# Local EDA / PDK environment
+# ============================================================
+
+.ciel/
+
+v3_hier/macros/cpu_block_old_backup/
+
+# Historical ECO experiments - not part of the golden reproducible flow
+/v3_hier/top/eco4b_branch_work/
+/v3_hier/top/eco4c_branch_work/
+/v3_hier/top/eco4e_move_addr_branches/
+/v3_hier/top/eco4f_branch_data_21_12_13/
+/v3_hier/top/eco4g_bulk10/
+/v3_hier/top/eco4h_cpu_valid_buffers/
+/v3_hier/top/eco4h_final_signoff/
+/v3_hier/top/eco4i_clean_reroute/
+/v3_hier/top/eco4j_surgical_route/
+/v3_hier/top/eco4k_capfix/
+/v3_hier/top/eco4l_clockcapfix/
+/v3_hier/top/eco4n_slew_resize/
+/v3_hier/top/eco4p_sram_slew_all/
+
+# Historical top-level ECO configuration experiments
+/v3_hier/top/config_top_newcpu_eco*.json
+!/v3_hier/top/config_top_newcpu_eco19_full_repro_50mhz.json
+!/v3_hier/top/config_top_newcpu_eco4m_final_50mhz.json
+!/v3_hier/top/config_top_newcpu_eco4o_signoff_50mhz.json
+
+# Unreferenced top-level configuration variants
+/v3_hier/top/config_top_50mhz.json
+/v3_hier/top/config_top_abs_50mhz.json
+
+# Historical CPU configuration experiments
+/v3_hier/cpu/config_cpu_*.json
+!/v3_hier/cpu/config_cpu_reset_min020_eco2_50mhz.json
+
+# Historical CPU macro backup
+/v3_hier/macros/cpu_block_old_backup/
+
+# CPU macro timing constraints
+!/v3_hier/cpu/constraints/
+!/v3_hier/cpu/constraints/**/*.sdc
+
+# Final CPU macro SDC
+!/v3_hier/macros/cpu_block/sdc/
+!/v3_hier/macros/cpu_block/sdc/**/*.sdc
+
+# Final CPU macro physical collateral
+!/v3_hier/macros/cpu_block/gds/
+!/v3_hier/macros/cpu_block/gds/*.gds
+!/v3_hier/macros/cpu_block/spef/
+!/v3_hier/macros/cpu_block/spef/**/*.spef
+
+# Historical CPU constraint experiments
+/v3_hier/cpu/constraints/*.sdc
+!/v3_hier/cpu/constraints/cpu_50mhz_reset_min020.sdc
+
+# Historical root-level V1/V2 flow configurations
+/config*.json
+
+# Historical top-level SDC experiments
+/v3_hier/top/constraints/*.sdc
+!/v3_hier/top/constraints/top_50mhz_eco19_repro_pnr.sdc
+!/v3_hier/top/constraints/top_50mhz_eco4m_final.sdc
+
+# Final CPU macro physical collateral
+!/v3_hier/macros/cpu_block/gds/
+!/v3_hier/macros/cpu_block/gds/*.gds
+!/v3_hier/macros/cpu_block/spef/
+!/v3_hier/macros/cpu_block/spef/**/*.spef
+
+/v3_hier/top/eco4m_antennafix/lvs_netlist_fix/soc_top.eco2.gold.pnl.v
+
+# Historical ECO4M artifacts
+/v3_hier/top/eco4m_antennafix/

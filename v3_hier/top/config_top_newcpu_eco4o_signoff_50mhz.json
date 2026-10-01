@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "flow": "Classic"
+  },
+  "PRIMARY_GDSII_STREAMOUT_TOOL": "klayout",
+  "RUN_KLAYOUT_STREAMOUT": true,
+  "RUN_MAGIC_STREAMOUT": false,
+  "RUN_MAGIC_DRC": false,
+  "RUN_KLAYOUT_XOR": false,
+  "RUN_KLAYOUT_DRC": true,
+  "RUN_LVS": true,
+  "ERROR_ON_KLAYOUT_DRC": true,
+  "ERROR_ON_LVS_ERROR": true,
+  "MAGIC_EXT_USE_GDS": false,
+  "RUN_IRDROP_REPORT": false,
+  "RUN_EQY": false
+}

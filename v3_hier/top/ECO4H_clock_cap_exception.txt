@@ -1,0 +1,41 @@
+PicoRV32 AXI SoC - ECO4H clock capacitance signoff exception
+
+Final implementation:
+  top_newcpu_eco4h_cpu_valid_50mhz
+
+Global user constraint:
+  MAX_CAPACITANCE_CONSTRAINT = 0.200 pF
+
+Remaining clock-net max-cap checks at max_ss_100C_1v60:
+
+  clkbuf_2_1_0_clk_regs/X
+    constraint = 0.200000 pF
+    extracted  = 0.223612 pF
+
+  clkbuf_2_0_0_clk_regs/X
+    constraint = 0.200000 pF
+    extracted  = 0.205942 pF
+
+Driver:
+  sky130_fd_sc_hd__clkbuf_8
+
+SKY130 HD ss_100C_1v60 Liberty:
+  clkbuf_8/X max_capacitance = 0.585947 pF
+  clkbuf_8/X max_transition  = 1.502087 ns
+
+Conclusion:
+  Both clock nets violate the project-wide 0.200 pF constraint,
+  but remain far below the actual clkbuf_8 Liberty max-cap limit.
+
+  No physical clock-tree ECO is applied because the clock drivers
+  are not electrically overloaded and post-route hold margin is small.
+
+Final ECO4H timing:
+  setup violations = 0
+  hold violations  = 0
+  worst setup slack = +1.6028 ns
+  worst hold slack  = +0.0258 ns
+
+Decision:
+  Accept these two clock max-cap checks as clock-specific
+  signoff exceptions to the artificial global 0.200 pF target.
