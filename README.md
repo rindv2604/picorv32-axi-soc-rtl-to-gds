@@ -600,7 +600,73 @@ ram.u_sram_macro/wmask0[0:3]
 ### ECO Strategy
 
 The ECO work focused on **targeted physical repair**, rather than a
-broad re-route of the completed design.
+broad re-route of the completed design. The key point was to diagnose
+the failing electrical paths first, then make the smallest physical
+change that improved transition without creating a timing or routing
+regression.
+
+The ECO methodology was:
+
+``` text
+Identify violating SRAM pins
+        ↓
+Inspect driver / fanout / capacitance / wire distance
+        ↓
+Classify root cause
+        ↓
+Driver upsizing or targeted buffer insertion
+        ↓
+Legalize placement
+        ↓
+Incremental / detailed routing
+        ↓
+RC extraction
+        ↓
+Multi-corner post-route STA
+        ↓
+DRC + antenna + LVS
+```
+
+For the SRAM inputs, the preferred physical repair order was:
+
+1. Inspect the existing driver and routing topology.
+2. Upsize a weak source driver when legal and timing-safe.
+3. Insert an appropriately sized buffer close to the SRAM input when
+   required.
+4. Split long RC segments using buffer staging.
+5. Create a dedicated SRAM branch for shared/high-fanout loads when
+   appropriate.
+6. Keep the final-stage buffer physically close to the SRAM input.
+7. Avoid unnecessary buffer chains and avoid adding excessive load to
+   upstream timing paths.
+
+After every physical ECO, the modified database had to be legalized and
+routed again before trusting the new STA result. This prevents an
+optimization from being accepted based only on an idealized pre-route
+timing calculation.
+
+The ECO was retained only when the target electrical violation improved
+without introducing setup, hold, max-capacitance, routing or physical
+verification regressions.
+
+### ECO Timing Result
+
+The starting ECO analysis had already reached positive setup/hold slack,
+so the remaining problem was primarily **maximum transition (slew)** on
+the SRAM interface rather than a setup/hold violation. The diagnostic
+baseline had approximately:
+
+| Metric | Pre-ECO diagnostic baseline | Final ECO19 |
+|:-------|----------------------------:|------------:|
+| Setup WNS | **+1.5962 ns** | **+1.6043 ns** |
+| Hold WNS | **+0.0876 ns** | **+0.0893 ns** |
+| Max cap violations | **0** | **0** |
+| Max slew violations | **20** | **0** |
+
+The pre-ECO numbers above are the ECO4N timing-diagnostic baseline;
+ECO4N itself was not treated as the final physical sign-off database.
+The final physical implementation was taken from the known-good routed
+baseline and then closed through the subsequent ECO flow.
 
 The final ECO19 implementation achieved:
 
@@ -700,6 +766,25 @@ manufacturing rules evaluated by the selected verification flow.
 | KLayout DRC         | **PASS** |
 | Illegal overlaps    |    **0** |
 
+### DRC / Routing Closure Method
+
+DRC closure was handled as part of the physical ECO flow rather than by
+editing the final layout geometry manually. After any ECO cell resize or
+buffer insertion, the physical database was:
+
+1. legalized so that new cells occupied legal sites;
+2. checked for placement legality and connectivity;
+3. incrementally/detailed-routed as required;
+4. checked for routing DRT markers; and
+5. re-verified with the selected foundry DRC flow.
+
+New ECO cells also had to have valid signal connectivity and power/ground
+connectivity before the database could be considered a valid physical
+checkpoint.
+
+The final implementation reached zero routing DRT markers, zero illegal
+overlaps and zero reported KLayout DRC errors.
+
 The final full reproducibility run also reported DRC as passed in the
 manufacturability report.
 
@@ -733,6 +818,35 @@ reference netlist.
 
 This provides evidence that the extracted physical circuit matches the
 reference connectivity for the final sign-off database.
+
+### LVS Consistency / Mismatch Prevention
+
+A critical LVS requirement in an ECO flow is that the physical database
+and logical reference netlist belong to the **same implementation
+revision**. Mixing an older physical extraction with a newer or older
+logical netlist can create apparent LVS mismatches that are caused by
+state mixing rather than by an actual layout connectivity error.
+
+For final validation, the following sources were kept aligned to the
+same ECO implementation:
+
+``` text
+Physical ODB
+Physical DEF
+Final GDS
+Post-ECO logical netlist
+        ↓
+      Netgen LVS
+```
+
+Before running LVS, the physical and logical source paths should be
+printed and checked for the same ECO revision. If the sources are from
+different revisions, the correct matching post-ECO netlist/extraction
+must be selected before interpreting the LVS result.
+
+This source-consistency check is especially important in a hierarchical
+flow because CPU hard-macro collateral, top-level routing databases and
+post-ECO netlists may exist in multiple historical run directories.
 
 ------------------------------------------------------------------------
 
@@ -1010,10 +1124,9 @@ KLayout can be used to inspect the final GDSII.
 ## ECO19 Was a Targeted Timing/Electrical Closure
 
 The final physical implementation was not produced by repeatedly
-re-routing the entire design.
-
-The ECO19 work targeted the remaining SRAM-interface transition problem
-while preserving the already-clean routed implementation.
+re-routing the entire design. The ECO19 work targeted the remaining
+SRAM-interface transition problem while preserving the already-clean
+routed implementation.
 
 This distinction is important for physical-design engineering:
 
@@ -1022,15 +1135,17 @@ Initial routed design
         ↓
 Identify exact failing nets/pins
         ↓
-Targeted ECO
+Driver / load / RC diagnosis
         ↓
-Incremental routing / repair
+Targeted resize / buffer ECO
+        ↓
+Legalize + incremental route
         ↓
 RC extraction
         ↓
-STA + electrical checks
+Multi-corner STA
         ↓
-DRC + LVS
+DRC + antenna + LVS
 ```
 
 The final worst SRAM transition was:
@@ -1093,6 +1208,25 @@ The project deliberately separates:
 A design passing setup/hold does not by itself prove that every physical
 or electrical rule has been satisfied. Similarly, a DRC-clean layout
 does not replace LVS.
+
+For this project, final closure was therefore treated as a chain of
+independent checks:
+
+``` text
+Timing / Slew
+    +
+Routing / DRT
+    +
+Antenna
+    +
+DRC
+    +
+LVS
+    +
+Full-flow reproducibility
+    ↓
+Final sign-off candidate
+```
 
 ------------------------------------------------------------------------
 
